@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android"
+           id="cordova-plugin-serial-device"
+      version="1.0.0">
+    <name>SerialDevice</name>
+    <description>Cordova Serial Device Plugin</description>
+    <keywords>cordova,serial,device</keywords>
+
+    <js-module src="www/SerialDevice.js" name="serialDevice">
+        <clobbers target="navigator.serialDevice" />
+    </js-module>
+
+    <!-- windows -->
+    <platform name="windows">
+        <js-module src="src/windows/SerialDeviceProxy.js" name="SerialDeviceProxy">
+             <merges target=""/>
+        </js-module>
+
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="serialcommunication">
+                <Device Id="any">
+                    <Function Type="name:serialPort" />
+                </Device>
+            </DeviceCapability>
+        </config-file>
+    </platform>
+
+</plugin>

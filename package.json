@@ -1,0 +1,23 @@
+{
+  "name": "cordova-plugin-clippingcamera",
+  "version": "1.0.0",
+  "description": "Cordova ClippingCamera Plugin",
+  "cordova": {
+    "id": "cordova-plugin-clippingcamera",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conveyGmbH/cordova-plugin-clippingcamera"
+  },
+  "keywords": [
+    "cordova",
+    "serial",
+    "device",
+    "ecosystem:cordova",
+    "cordova-windows"
+  ],
+  "author": "convey Information Systems GmbH"
+}

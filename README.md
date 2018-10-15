@@ -1,1 +1,1 @@
-"# cordova-plugin-serial-device" 
+# cordova-plugin-serial-device
