@@ -764,6 +764,27 @@
                 var reader = new Windows.Storage.Streams.DataReader(stream);
                 //reader.InputStreamOptions = Windows.Storage.Streams.InputStreamOptions.Partial;
                 this.readingPromise = reader.loadAsync(bytesToRead).then(function(bytesRead) {
+					function readUnknownString(count) {
+						var result = "";
+						if (count > 0) {
+							try {
+								result += reader.readString(count);
+							} catch (e) {
+								var buffer = reader.readBuffer(count);
+								var arrByte = Windows.Security.Cryptography.CryptographicBuffer.copyToByteArray(buffer);
+								for (var i=0; i<arrByte.length; i++) {
+									var c;
+									try {
+									    c = String.fromCharCode(arrByte[i]);
+									} catch(e) {
+										c = "?";
+									}
+								    result += c;
+								}
+							}
+						}
+						return result;
+					}
                     that.totalBytesRead += bytesRead;
                     that.printTotalReadWriteBytes();
                     if (prefixLength && bytesRead > prefixLength && prefixBinary && prefixBinary.length > 0) {
@@ -773,10 +794,10 @@
                             var encoded = Windows.Security.Cryptography.CryptographicBuffer.encodeToBase64String(buffer);
                             that.resultString += encoded;
                         } else {
-                            that.resultString += reader.readString(bytesRead - prefixLength);
+                            that.resultString += readUnknownString(bytesRead - prefixLength);
                         }
                     } else {
-                        that.resultString += reader.readString(bytesRead);
+                        that.resultString += readUnknownString(bytesRead);
                     }
                     reader.detachStream();
                     reader.close();
@@ -1292,11 +1313,10 @@
                         if (error.name === "Canceled") {
                             WinJS.log && WinJS.log("Read Canceled...", "sample", "status");
                         } else {
-                            fail({
-                                id: id,
-                                connectionStatus: deviceConnection.connectionStatus,
-                                ioStatus: deviceConnection.ioStatus
-                            });
+							error.id = id;
+							error.connectionStatus = deviceConnection.connectionStatus;
+							error.ioStatus = deviceConnection.ioStatus;
+                            fail(error);
                         }
                     });
                 } else {
