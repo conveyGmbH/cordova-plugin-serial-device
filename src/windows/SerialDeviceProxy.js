@@ -463,7 +463,7 @@
                 this._onAppSuspensionBound = this._onAppSuspension.bind(this);
                 Windows.UI.WebUI.WebUIApplication.addEventListener("suspending", this._onAppSuspensionBound);
 
-                this._onAppResumeBound = this._onAppResume;
+                this._onAppResumeBound = this._onAppResume.bind(this);
                 Windows.UI.WebUI.WebUIApplication.addEventListener("resuming", this._onAppResumeBound);
             },
             _unregisterFromAppEvents: function () {
@@ -479,16 +479,20 @@
             // Note that, when disconnecting the device, the device may be closed by the system before the OnDeviceRemoved callback is invoked.
             // </summary>
             _registerForDeviceWatcherEvents: function () {
-                this._onDeviceAddedBound = this._onDeviceAdded.bind(this);
-                this._deviceWatcher.addEventListener("added", this._onDeviceAddedBound, false);
-                this._onDeviceRemovedBound = this._onDeviceRemoved.bind(this);
-                this._deviceWatcher.addEventListener("removed", this._onDeviceRemovedBound, false);
+                if (this._deviceWatcher) {
+                    this._onDeviceAddedBound = this._onDeviceAdded.bind(this);
+                    this._deviceWatcher.addEventListener("added", this._onDeviceAddedBound, false);
+                    this._onDeviceRemovedBound = this._onDeviceRemoved.bind(this);
+                    this._deviceWatcher.addEventListener("removed", this._onDeviceRemovedBound, false);
+                }
             },
             _unregisterFromDeviceWatcherEvents: function () {
-                this._deviceWatcher.removeEventListener("added", this._onDeviceAddedBound);
-                this._onDeviceAddedBound = null;
-                this._deviceWatcher.removeEventListener("removed", this._onDeviceRemovedBound);
-                this._onDeviceRemovedBound = null;
+                if (this._deviceWatcher) {
+                    this._deviceWatcher.removeEventListener("added", this._onDeviceAddedBound);
+                    this._onDeviceAddedBound = null;
+                    this._deviceWatcher.removeEventListener("removed", this._onDeviceRemovedBound);
+                    this._onDeviceRemovedBound = null;
+                }
             },
             // <summary>
             // Listen for any changed in device access permission. The user can block access to the device while the device is in use.
@@ -510,19 +514,22 @@
                 this._onDeviceAccessChangedBound = null;
             },
             _startDeviceWatcher: function () {
-                this._watcherStarted = true;
+                if (this._deviceWatcher) {
+                    this._watcherStarted = true;
 
-                if (this._deviceWatcher.status !== Windows.Devices.Enumeration.DeviceWatcherStatus.started
-                    && this._deviceWatcher.status !== Windows.Devices.Enumeration.DeviceWatcherStatus.enumerationCompleted) {
-                    this._deviceWatcher.start();
+                    if (this._deviceWatcher.status !== Windows.Devices.Enumeration.DeviceWatcherStatus.started
+                        && this._deviceWatcher.status !== Windows.Devices.Enumeration.DeviceWatcherStatus.enumerationCompleted) {
+                        this._deviceWatcher.start();
+                    }
                 }
             },
             _stopDeviceWatchers: function () {
-                if (this._deviceWatcher.status === Windows.Devices.Enumeration.DeviceWatcherStatus.started
-                    || this._deviceWatcher.status === Windows.Devices.Enumeration.DeviceWatcherStatus.enumerationCompleted) {
-                    this._deviceWatcher.stop();
+                if (this._deviceWatcher) {
+                    if (this._deviceWatcher.status === Windows.Devices.Enumeration.DeviceWatcherStatus.started
+                        || this._deviceWatcher.status === Windows.Devices.Enumeration.DeviceWatcherStatus.enumerationCompleted) {
+                        this._deviceWatcher.stop();
+                    }
                 }
-
                 this._watcherStarted = false;
             },
             // <summary>
@@ -569,8 +576,11 @@
             // <param name="arg"></param>
             _onAppResume: function (arg) {
                 if (this._watcherSuspended) {
-                    this._watcherSuspended = false;
-                    this._startDeviceWatcher();
+                    var that = this;
+                    WinJS.Promise.timeout(250).then(function() {
+                        that._watcherSuspended = false;
+                        that._startDeviceWatcher();
+                    })
                 }
             },
             // <summary>
