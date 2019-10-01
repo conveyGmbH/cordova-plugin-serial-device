@@ -461,17 +461,17 @@
             _registerForAppEvents: function () {
                 // This event is raised when the app is exited and when the app is suspended
                 this._onAppSuspensionBound = this._onAppSuspension.bind(this);
-                Windows.UI.WebUI.WebUIApplication.addEventListener("suspending", this._onAppSuspensionBound);
+                Windows.UI.WebUI.WebUIApplication.addEventListener("pause", this._onAppSuspensionBound);
 
                 this._onAppResumeBound = this._onAppResume.bind(this);
-                Windows.UI.WebUI.WebUIApplication.addEventListener("resuming", this._onAppResumeBound);
+                Windows.UI.WebUI.WebUIApplication.addEventListener("resume", this._onAppResumeBound);
             },
             _unregisterFromAppEvents: function () {
                 // This event is raised when the app is exited and when the app is suspended
-                Windows.UI.WebUI.WebUIApplication.removeEventListener("suspending", this._onAppSuspensionBound);
+                Windows.UI.WebUI.WebUIApplication.removeEventListener("pause", this._onAppSuspensionBound);
                 this._onAppSuspensionBound = null;
 
-                Windows.UI.WebUI.WebUIApplication.removeEventListener("resuming", this._onAppResumeBound);
+                Windows.UI.WebUI.WebUIApplication.removeEventListener("resume", this._onAppResumeBound);
                 this._onAppResumeBound = null;
             },
             // <summary>
